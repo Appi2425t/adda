@@ -82,20 +82,14 @@ if ADMIN_IDS_RAW:
 
 
 def rewrite_db_url(url: str) -> str:
-    """Rewrite postgres:// or postgresql:// to postgresql+asyncpg:// for asyncpg."""
-    if url.startswith("postgresql+asyncpg://"):
-        return url
-    if url.startswith("postgresql://"):
-        return url.replace("postgresql://", "postgresql+asyncpg://", 1)
+    """Ensure the URL uses postgresql:// (asyncpg does NOT accept +asyncpg suffix)."""
     if url.startswith("postgres://"):
-        return url.replace("postgres://", "postgresql+asyncpg://", 1)
+        return url.replace("postgres://", "postgresql://", 1)
     return url
 
 
 def rewrite_db_url_sync(url: str) -> str:
-    """Ensure the URL uses postgresql:// (sync SQLAlchemy for APScheduler job store)."""
-    if url.startswith("postgresql+asyncpg://"):
-        return url.replace("postgresql+asyncpg://", "postgresql://", 1)
+    """Ensure the URL uses postgresql:// (for sync SQLAlchemy APScheduler job store)."""
     if url.startswith("postgres://"):
         return url.replace("postgres://", "postgresql://", 1)
     return url
