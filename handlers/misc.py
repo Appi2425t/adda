@@ -7,9 +7,70 @@ from telegram import Update
 from telegram.ext import ContextTypes
 
 from db import get_pool
-from handlers.admin import is_admin
+from handlers.admin import is_admin, check_admin
 
 logger = logging.getLogger(__name__)
+
+CLIST_TEXT = """All Commands & Usage
+
+SCHEDULES
+─────────────────────────────────────────
+/schedule              Create a new scheduled message (interactive flow)
+/schedules             List all active schedules
+/edit <id>             Edit an existing schedule's content, target, or time
+/cancel <id>           Cancel (deactivate) a schedule
+/pause <id>            Pause a schedule without deleting it
+/resume <id>           Resume a paused schedule
+/preview <id>          Preview what a schedule will send
+/test <id>             Send a test message to verify bot can reach the target
+/next                  Show the next 10 upcoming scheduled sends
+
+BROADCAST & TEMPLATES
+─────────────────────────────────────────
+/broadcast             Send the same message to multiple targets at once
+/savetemplate          Save a reusable message template (interactive)
+/templates             List all saved templates
+/usetemplate <name>    Load a template — its content is used in the next /schedule
+/deletetemplate <name> Delete a saved template
+
+TARGETS
+─────────────────────────────────────────
+/addtarget <id> <label>   Save a chat/channel/group as a named target
+/removetarget <label>     Remove a saved target by label
+/targets                  List all saved targets
+
+SAFETY
+─────────────────────────────────────────
+/blacklistadd <id> [reason]  Block the bot from sending to a chat
+/unblacklist <id>            Unblock a chat
+/blacklist                   List all blacklisted chats
+/duplicates                  Find schedules with same target + content
+
+DATA
+─────────────────────────────────────────
+/export                     Export all active schedules as a JSON file
+/import                     Import schedules from a JSON file (attach .json)
+/logs [hours]               View send history (default: last 24h)
+/cleanup [days]             Delete old send logs (default: older than 30 days)
+
+INFO
+─────────────────────────────────────────
+/whoami                     Get your Telegram user ID (for ADMIN_IDS setup)
+/stats                      View detailed bot statistics
+/help                       Show categorized help text
+/clist                      Show this full command list with usage
+/start                      Welcome message
+
+EXAMPLES
+─────────────────────────────────────────
+/addtarget -100123456 main_channel
+/blacklistadd -10099999 spam_group bots are not welcome
+/savetemplate              (then send a name, then the message)
+/usetemplate daily_news   (then run /schedule to use it)
+/logs 48                   (show last 48 hours of send history)
+/cleanup 7                 (delete logs older than 7 days)
+"""
+
 
 HELP_TEXT = """Telegram Auto-Scheduler Bot — Commands
 
@@ -52,11 +113,14 @@ Info:
 /whoami — Get your Telegram user ID
 /stats — View detailed statistics
 /help — Show this help message
+/clist — Show full command list with usage & examples
 """
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle /start command."""
+    if not await check_admin(update):
+        return
     await update.message.reply_text(
         "Welcome to the Telegram Auto-Scheduler Bot!\n\n"
         "Schedule messages to be sent automatically — one-time or recurring.\n"
@@ -67,11 +131,22 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def help_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle /help command."""
+    if not await check_admin(update):
+        return
     await update.message.reply_text(HELP_TEXT)
+
+
+async def clist(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /clist command — show full command list with usage and examples."""
+    if not await check_admin(update):
+        return
+    await update.message.reply_text(CLIST_TEXT)
 
 
 async def stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Show detailed message statistics."""
+    if not await check_admin(update):
+        return
     pool = get_pool()
     async with pool.acquire() as conn:
         total_sent = await conn.fetchval("SELECT COUNT(*) FROM send_log WHERE status = 'success'")

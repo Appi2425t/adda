@@ -47,7 +47,7 @@ from handlers.manage import (
 )
 from handlers.blacklist import blacklist_add, blacklist_remove, blacklist_list
 from handlers.admin import whoami
-from handlers.misc import start, help_cmd, stats, cleanup
+from handlers.misc import start, help_cmd, clist, stats, cleanup
 
 # ── Logging ──────────────────────────────────────────────────────────────────
 
@@ -149,6 +149,7 @@ def main() -> None:
     # ── Core commands ───────────────────────────────────────────────────────
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("help", help_cmd))
+    application.add_handler(CommandHandler("clist", clist))
     application.add_handler(CommandHandler("whoami", whoami))
     application.add_handler(CommandHandler("stats", stats))
     application.add_handler(CommandHandler("cleanup", cleanup))

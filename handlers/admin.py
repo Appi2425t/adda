@@ -32,7 +32,7 @@ async def check_admin(update: Update) -> bool:
     if not is_admin(user_id):
         await update.message.reply_text(
             "Access denied. Only admins can use this command.\n"
-            "Run /whoami to get your user ID, then add it to ADMIN_IDS."
+            "Run /whoami to get your user ID."
         )
         return False
     return True

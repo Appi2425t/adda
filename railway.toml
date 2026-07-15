@@ -1,0 +1,18 @@
+[build]
+builder = "nixpacks"
+
+[deploy]
+startCommand = "python main.py"
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 10
+
+[variables]
+# ── Required — set these in Railway dashboard ──────────────────────────────────
+# BOT_TOKEN = ""         # Telegram bot token from @BotFather
+# ADMIN_IDS = ""         # Comma-separated Telegram user IDs (use /whoami to find yours)
+
+# ── Optional ──────────────────────────────────────────────────────────────────
+DEFAULT_TIMEZONE = "Asia/Kolkata"
+
+# ── Auto-injected by Railway when Postgres plugin is attached ─────────────────
+# DATABASE_URL is automatically set — do NOT add it here.

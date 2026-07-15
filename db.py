@@ -91,8 +91,12 @@ CREATE INDEX IF NOT EXISTS idx_blacklist_chat ON blacklist(chat_id);
 async def connect() -> asyncpg.Pool:
     global pool
     url = rewrite_db_url(DATABASE_URL)
+    # Mask password for logs
+    import re
+    masked = re.sub(r"://([^:]+):([^@]+)@", r"://\1:***@", url)
+    logger.info(f"Connecting to PostgreSQL: {masked}")
     pool = await asyncpg.create_pool(url, min_size=2, max_size=10)
-    logger.info("Connected to PostgreSQL")
+    logger.info("Connected to PostgreSQL successfully")
     return pool
 
 

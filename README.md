@@ -26,27 +26,27 @@ A production-ready Telegram bot for scheduling messages to be sent automatically
 ## Project Structure
 
 ```
-Procfile                       # Railway root-level entrypoint
-bot/
-  main.py                      # Entrypoint: init bot, DB, scheduler
-  config.py                    # Env var loading + validation
-  db.py                        # Asyncpg pool + migrations
-  scheduler.py                 # APScheduler + rate limiter + blacklisting
-  models.py                    # Dataclasses
-  handlers/
-    __init__.py
-    schedule.py                # /schedule conversation flow
-    broadcast.py               # /broadcast multi-target send
-    edit.py                    # /edit modify existing schedules
-    templates.py               # /savetemplate, /templates, /usetemplate
-    manage.py                  # /schedules, /cancel, /pause, /resume, /preview, /test, /next, /logs, /export, /import
-    blacklist.py               # /blacklistadd, /unblacklist, /blacklist
-    admin.py                   # /whoami, permission checks
-    misc.py                    # /start, /help, /stats, /cleanup
-  requirements.txt
-  Procfile                     # Local dev entrypoint
-  runtime.txt
-  .env.example
+Procfile               # Railway entrypoint
+railway.toml           # Railway build/deploy config
+main.py                # Entrypoint: init bot, DB, scheduler
+config.py              # Env var loading + auto-detection
+db.py                  # Asyncpg pool + migrations
+scheduler.py           # APScheduler + rate limiter + blacklisting
+models.py              # Dataclasses
+handlers/
+  __init__.py
+  schedule.py          # /schedule conversation flow
+  broadcast.py         # /broadcast multi-target send
+  edit.py              # /edit modify existing schedules
+  templates.py         # /savetemplate, /templates, /usetemplate
+  manage.py            # /schedules, /cancel, /pause, /resume, /preview, /test, /next, /logs, /export, /import
+  blacklist.py         # /blacklistadd, /unblacklist, /blacklist
+  admin.py             # /whoami, permission checks
+  misc.py              # /start, /help, /clist, /stats, /cleanup
+requirements.txt
+runtime.txt
+.env.example
+README.md
 ```
 
 ## Commands
@@ -155,10 +155,10 @@ cp .env.example .env
 # Edit .env with your BOT_TOKEN, DATABASE_URL, ADMIN_IDS
 
 # Install dependencies
-pip install -r bot/requirements.txt
+pip install -r requirements.txt
 
 # Run
-cd bot && python main.py
+python main.py
 ```
 
 You need a local PostgreSQL instance or a remote one (e.g., via Railway's connect feature).
